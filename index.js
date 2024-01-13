@@ -11,7 +11,7 @@ app.use(cors());
 
 app.use('/', router); // Use the router at the root path
 
-const url = process.env.DB_URL;
+const url = 'mongodb+srv://ajithraveendranr:Nf6QrrhvxLFF6TVc@portfolio.61ybdfy.mongodb.net/';
 
 let fn = async () => {
   try {
