@@ -42,8 +42,9 @@ router.delete("/clean/db", async (req, res) => {
   res.send(data);
 });
 router.get("/viewCoins", async (req, res) => {
-  console.log("-----------");
   let data = await AddCoin.viewCoins();
+  console.log("-----------");
+  console.log(data);
   res.send(data);
 });
 router.post("/edit/coin", async (req, res) => {
