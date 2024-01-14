@@ -11,17 +11,18 @@ app.use(cors());
 
 app.use('/', router); // Use the router at the root path
 
-const url = 'mongodb+srv://ajithraveendranr:Nf6QrrhvxLFF6TVc@portfolio.61ybdfy.mongodb.net/';
+const url = process.env.DB_URL;
 
 let fn = async () => {
   try {
-    await mongoose.connect(url);
+    await mongoose.connect(`${url}/;`);
     console.log("connected...");
  
   } catch (err) {
     console.error(err);
   }
 };
+
 fn();
 
 

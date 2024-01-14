@@ -125,7 +125,7 @@ async function updateKucoinDB(name, quantity, exchange, ExistCoin) {
   if (ExistCoin && trades.length > 0) {
     avgAmount = (trades[0].price + ExistCoin.avgBuyAmount) / 2;
   } else if(trades.length > 0) avgAmount = trades[0].price;
-  else avgAmount = (10 / quantity);
+else avgAmount = (10 / quantity);
 
   try {
     if (trades.length > 0) {
@@ -177,7 +177,6 @@ async function updateKucoinDB(name, quantity, exchange, ExistCoin) {
 async function viewCoins() {
   try {
     const AllCoins = await coinModel.find();
-
     return AllCoins;
   } catch (e) {
     console.log(e);
