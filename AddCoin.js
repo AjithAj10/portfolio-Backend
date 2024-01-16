@@ -15,6 +15,21 @@ async function createCoin({
   try {
     let ExistCoin = await coinModel.findOne({ name: name });
 
+    if (
+      ExistCoin &&
+      ExistCoin.quantity == quantity &&
+      ExistCoin.status === "in-progress"
+    ) {
+      editCoin(
+        name,
+        avgBuyAmount,
+        quantity,
+        investedAmount,
+        lastDate,
+        status,
+        exchange
+      );
+    }
     if (ExistCoin && ExistCoin.quantity == quantity) {
       console.log(name + " exist");
       return;
@@ -27,7 +42,14 @@ async function createCoin({
     let trades = null;
 
     if (exchange === "ku_coin") {
-      updateKucoinDB(name, quantity, exchange, ExistCoin);
+      updateKucoinDB(
+        name,
+        quantity,
+        exchange,
+        ExistCoin,
+        avgBuyAmount,
+        investedAmount
+      );
       return;
     } else {
       trades = await getLatestTrades(`${name}USDT`);
@@ -114,7 +136,14 @@ async function createCoin({
   }
 }
 
-async function updateKucoinDB(name, quantity, exchange, ExistCoin) {
+async function updateKucoinDB(
+  name,
+  quantity,
+  exchange,
+  ExistCoin,
+  avgBuyAmount,
+  investedAmount
+) {
   const allTrades = await getTades();
   let trades = allTrades.filter((trade) => trade.symbol === `${name}-USDT`);
   if (quantity == 0) return;
@@ -124,14 +153,13 @@ async function updateKucoinDB(name, quantity, exchange, ExistCoin) {
 
   if (ExistCoin && trades.length > 0) {
     avgAmount = (trades[0].price + ExistCoin.avgBuyAmount) / 2;
-  } else if(trades.length > 0) avgAmount = trades[0].price;
-else avgAmount = (10 / quantity);
+  } else if (trades.length > 0) avgAmount = trades[0].price;
+  else avgAmount = investedAmount ? investedAmount / quantity : 10 / quantity;
 
   try {
     if (trades.length > 0) {
       if (!(Math.abs(trades[trades.length - 1].size - quantity) > 0.1)) {
         const trade = trades[trades.length - 1];
-
         newCoin = new coinModel({
           name,
           avgBuyAmount: avgAmount,
@@ -144,31 +172,41 @@ else avgAmount = (10 / quantity);
 
         await coinModel.create(newCoin);
       } else {
-        const avg = 10 / quantity;
+        const avg = investedAmount ? investedAmount / quantity : 10 / quantity;
         newCoin = new coinModel({
           name,
           avgBuyAmount: avg,
           quantity,
-          investedAmount: 10,
+          investedAmount: investedAmount ?? 10,
           date: Date.now(),
           exchange: exchange,
           status: "in-progress",
         });
-        if (ExistCoin) await coinModel.updateOne({ id: ExistCoin.id, exchange:"ku_coin"}, newCoin);
+        if (ExistCoin)
+          await coinModel.updateOne(
+            { id: ExistCoin.id, exchange: "ku_coin" },
+            newCoin
+          );
         else await coinModel.create(newCoin);
       }
     } else {
-      const avg = 10 / quantity;
+      const avg = investedAmount ? investedAmount / quantity : 10 / quantity;
       newCoin = new coinModel({
         name,
-        avgBuyAmount: avg,
+        avgBuyAmount: avgBuyAmount ?? avg,
         quantity,
-        investedAmount: 10,
+        investedAmount: investedAmount ?? 10,
         date: Date.now(),
         exchange: exchange,
         status: "in-progress",
       });
+      if (ExistCoin)
+        await coinModel.updateOne(
+          { id: ExistCoin.id, exchange: "ku_coin" },
+          newCoin
+        );
       await coinModel.create(newCoin);
+      return newCoin;
     }
   } catch (err) {
     console.log(err, "error");
