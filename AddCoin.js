@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+
 const coinModel = require("./Models/coins");
 const { getLatestTrades } = require("./Binance");
 const { getTades } = require("./KuCoin");
@@ -8,7 +8,7 @@ async function createCoin({
   avgBuyAmount,
   quantity,
   investedAmount,
-  lastDate,
+  date,
   status,
   exchange,
 }) {
@@ -25,7 +25,7 @@ async function createCoin({
         avgBuyAmount,
         quantity,
         investedAmount,
-        lastDate,
+        date,
         status,
         exchange
       );
@@ -224,14 +224,15 @@ async function viewCoins() {
 async function trunc() {
   let ExistCoin = await coinModel.deleteMany();
 }
-async function editCoin({
+async function editCoin(
   name,
   avgBuyAmount,
   quantity,
   investedAmount,
   date,
   status,
-}) {
+  exchange
+) {
   try {
     const lastDate = new Date(date);
 
@@ -242,6 +243,7 @@ async function editCoin({
       investedAmount,
       lastDate,
       status,
+      exchange
     });
 
     //let ExistCoin = await coinModel.findOne({ name: name });
@@ -254,6 +256,7 @@ async function editCoin({
         investedAmount: investedAmount,
         lastDate: lastDate,
         status: status,
+        exchange
       },
     };
 
