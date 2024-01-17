@@ -17,7 +17,7 @@ async function createCoin({
 
     if (
       ExistCoin &&
-      ExistCoin.quantity == quantity &&
+      ExistCoin.quantity !== quantity &&
       ExistCoin.status === "in-progress"
     ) {
       editCoin(
@@ -29,6 +29,7 @@ async function createCoin({
         status,
         exchange
       );
+      return;
     }
     if (ExistCoin && ExistCoin.quantity == quantity) {
       console.log(name + " exist");
