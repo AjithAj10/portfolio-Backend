@@ -6,6 +6,7 @@ const AddCoin = require("./AddCoin");
 const Ku_API_KEY = "654cf8e93872490001ce73f3";
 const axios = require("axios");
 const KuCoin = require("./KuCoin.js");
+const CoinMarketCap = require("./cryptoInfo.js");
 
 router.get("/binance/assets", async (req, res) => {
   try {
@@ -62,6 +63,14 @@ router.use("/ku/assets", async (req, res) => {
 router.use("/ku/trades", async (req, res) => {
   try {
     let data = await KuCoin.getTades();
+    res.send(data);
+  } catch (err) {
+    console.log(err);
+  }
+});
+router.use("/price", async (req, res) => {
+  try {
+    let data = await CoinMarketCap.getCoinPriceByShortTicker(req.body.coin);
     res.send(data);
   } catch (err) {
     console.log(err);
