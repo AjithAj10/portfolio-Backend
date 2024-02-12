@@ -13,6 +13,7 @@ async function createCoin({
   exchange,
 }) {
   try {
+    if(status === 'sold') deleteCoin(name);
     let ExistCoin = await coinModel.findOne({ name: name });
 
     if (
@@ -274,6 +275,10 @@ async function editCoin(
     console.log(e);
     return e;
   }
+}
+
+async function deleteCoin(name){
+  await coinModel.deleteOne({name: name});
 }
 
 module.exports = { createCoin, viewCoins, editCoin, trunc };
