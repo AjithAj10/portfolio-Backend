@@ -42,12 +42,23 @@ router.delete("/clean/db", async (req, res) => {
   let data = await AddCoin.trunc();
   res.send(data);
 });
+
 router.get("/viewCoins", async (req, res) => {
   let data = await AddCoin.viewCoins();
   res.send(data);
 });
+
 router.post("/edit/coin", async (req, res) => {
-  let data = await AddCoin.createCoin(req.body);
+  let data;
+
+  if (req.body.status === "active") data = await AddCoin.editCoin(req.body);
+
+  data = await AddCoin.createCoin(req.body);
+  res.send(data);
+});
+
+router.post("/add", async (req, res) => {
+  let data = await AddCoin.addCoin(req.body);
   res.send(data);
 });
 
@@ -76,6 +87,5 @@ router.use("/price", async (req, res) => {
     console.log(err);
   }
 });
-
 
 module.exports = router;

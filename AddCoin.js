@@ -1,4 +1,3 @@
-
 const coinModel = require("./Models/coins");
 const { getLatestTrades } = require("./Binance");
 const { getTades } = require("./KuCoin");
@@ -13,7 +12,7 @@ async function createCoin({
   exchange,
 }) {
   try {
-    if(status === 'sold') deleteCoin(name);
+    if (status === "sold") deleteCoin(name);
     let ExistCoin = await coinModel.findOne({ name: name });
 
     if (
@@ -138,6 +137,54 @@ async function createCoin({
   }
 }
 
+async function addCoin({
+  name,
+  avgBuyAmount,
+  quantity,
+  investedAmount,
+  date,
+  exchange,
+}) {
+  try {
+    if (quantity === 0 || investedAmount === 0 || !exchange) {
+      return "error";
+    }
+
+    let ExistCoin = await coinModel.findOne({ name: name });
+
+    if (ExistCoin) {
+      let newCoin = new coinModel({
+        name,
+        avgBuyAmount: (ExistCoin.avgBuyAmount + avgBuyAmount) / 2,
+        quantity: ExistCoin.quantity + quantity,
+        investedAmount: ExistCoin.investedAmount + investedAmount,
+        date,
+        exchange,
+        status: "Active",
+      });
+
+      let res = await coinModel.updateOne(newCoin);
+
+      return res;
+    }
+    let newCoin = new coinModel({
+      name,
+      avgBuyAmount,
+      quantity,
+      investedAmount,
+      date,
+      exchange,
+      status: "Active",
+    });
+
+    let res = await coinModel.create(newCoin);
+
+    return res;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 async function updateKucoinDB(
   name,
   quantity,
@@ -244,7 +291,7 @@ async function editCoin(
       investedAmount,
       lastDate,
       status,
-      exchange
+      exchange,
     });
 
     //let ExistCoin = await coinModel.findOne({ name: name });
@@ -257,7 +304,7 @@ async function editCoin(
         investedAmount: investedAmount,
         lastDate: lastDate,
         status: status,
-        exchange
+        exchange,
       },
     };
 
@@ -277,8 +324,8 @@ async function editCoin(
   }
 }
 
-async function deleteCoin(name){
-  await coinModel.deleteOne({name: name});
+async function deleteCoin(name) {
+  await coinModel.deleteOne({ name: name });
 }
 
-module.exports = { createCoin, viewCoins, editCoin, trunc };
+module.exports = { createCoin, viewCoins, editCoin, trunc, addCoin };
