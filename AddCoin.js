@@ -1,6 +1,7 @@
 const coinModel = require("./Models/coins");
 const { getLatestTrades } = require("./Binance");
 const { getTades } = require("./KuCoin");
+const cryptoPrice = require("./cryptoInfo");
 
 async function createCoin({
   name,
@@ -12,7 +13,22 @@ async function createCoin({
   exchange,
 }) {
   try {
-    if (status === "sold") deleteCoin(name);
+    if (status === "sold") {
+      deleteCoin(name);
+      return;
+    }
+    if (status === "active") {
+      editCoin(
+        name,
+        avgBuyAmount,
+        quantity,
+        investedAmount,
+        date,
+        status,
+        exchange
+      );
+      return;
+    }
     let ExistCoin = await coinModel.findOne({ name: name });
 
     if (
@@ -263,8 +279,20 @@ async function updateKucoinDB(
 }
 async function viewCoins() {
   try {
-    const AllCoins = await coinModel.find();
-    return AllCoins;
+    const allCoins = await coinModel.find();
+
+    const coinSymbols = allCoins.map((coin) => coin.name);
+    const coinPrices = await fetchPricesForCoins(coinSymbols);
+
+    // Step 4: Combine data
+    const combinedData = allCoins.map((coin) => {
+      const fullName = tickerMap[coin.name.toLowerCase()];
+      const price = coinPrices[coin.name.toLowerCase()];
+      return { ...coin.toObject(), fullName, price };
+    });
+
+    // Step 5: Return combined data
+    return combinedData;
   } catch (e) {
     console.log(e);
   }
@@ -321,6 +349,20 @@ async function editCoin(
   } catch (e) {
     console.log(e);
     return e;
+  }
+}
+
+async function fetchPricesForCoins(symbols) {
+  try {
+    const coinPrices = {};
+    for (const symbol of symbols) {
+      const price = await cryptoPrice.getCoinPriceByShortTicker(symbol);
+      coinPrices[symbol?.toLowerCase()] = price;
+    }
+    return coinPrices;
+  } catch (error) {
+    console.error("Error fetching prices for coins:", error.message);
+    throw error;
   }
 }
 
