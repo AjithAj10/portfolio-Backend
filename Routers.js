@@ -50,10 +50,10 @@ router.get("/viewCoins", async (req, res) => {
 
 router.post("/edit/coin", async (req, res) => {
   let data;
+  if (req.body.status === "active"){
+    data = await AddCoin.editCoin(req.body);
+  }else  data = await AddCoin.createCoin(req.body);
 
-  if (req.body.status === "active") data = await AddCoin.editCoin(req.body);
-
-  data = await AddCoin.createCoin(req.body);
   res.send(data);
 });
 
