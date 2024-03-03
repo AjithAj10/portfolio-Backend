@@ -2,7 +2,7 @@ const coinModel = require("./Models/coins");
 const { getLatestTrades } = require("./Binance");
 const { getTades } = require("./KuCoin");
 const cryptoPrice = require("./cryptoInfo");
-
+const {fullObj} = require("./full");
 async function createCoin({
   name,
   avgBuyAmount,
@@ -282,17 +282,10 @@ async function viewCoins() {
     const allCoins = await coinModel.find();
 
     const coinSymbols = allCoins.map((coin) => coin.name);
-    const coinPrices = await fetchPricesForCoins(coinSymbols);
-
-    // Step 4: Combine data
-    const combinedData = allCoins.map((coin) => {
-      const fullName = tickerMap[coin.name.toLowerCase()];
-      const price = coinPrices[coin.name.toLowerCase()];
-      return { ...coin.toObject(), fullName, price };
-    });
+    
 
     // Step 5: Return combined data
-    return combinedData;
+    return allCoins;
   } catch (e) {
     console.log(e);
   }
@@ -302,6 +295,7 @@ async function trunc() {
 }
 async function editCoin(
   name,
+  coin,
   avgBuyAmount,
   quantity,
   investedAmount,
