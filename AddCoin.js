@@ -2,7 +2,6 @@ const coinModel = require("./Models/coins");
 const { getLatestTrades } = require("./Binance");
 const { getTades } = require("./KuCoin");
 const cryptoPrice = require("./cryptoInfo");
-const {fullObj} = require("./full");
 async function createCoin({
   name,
   avgBuyAmount,
