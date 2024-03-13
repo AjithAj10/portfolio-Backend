@@ -293,29 +293,22 @@ async function trunc() {
   let ExistCoin = await coinModel.deleteMany();
 }
 async function editCoin(
-  name,
+ { name,
   coin,
   avgBuyAmount,
   quantity,
   investedAmount,
   date,
   status,
-  exchange
+  exchange,
+  lastDate}
 ) {
   try {
+    if(date == ''){
+      return  {error: "Date cannot be null" };
+    }
+
     const lastDate = new Date(date);
-
-    let newCoin = new coinModel({
-      name,
-      avgBuyAmount,
-      quantity,
-      investedAmount,
-      lastDate,
-      status,
-      exchange,
-    });
-
-    //let ExistCoin = await coinModel.findOne({ name: name });
 
     const filter = { name: name }; // Specify the coin name to update
     const update = {
@@ -340,7 +333,6 @@ async function editCoin(
 
     return updatedCoin;
   } catch (e) {
-    console.log(e);
     return e;
   }
 }
@@ -354,7 +346,6 @@ async function fetchPricesForCoins(symbols) {
     }
     return coinPrices;
   } catch (error) {
-    console.error("Error fetching prices for coins:", error.message);
     throw error;
   }
 }

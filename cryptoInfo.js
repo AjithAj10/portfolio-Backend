@@ -1,48 +1,27 @@
-const axios = require('axios');
+const axios = require("axios");
 
-const buildTickerMap = async () => {
-  try {
-    const response = await axios.get('https://api.coincap.io/v2/assets');
-    const assets = response.data.data;
-
-    const tickerMap = {};
-    assets.forEach((asset) => {
-      const shortTicker = asset.symbol.toLowerCase();
-      const fullName = asset.name.toLowerCase();
-      tickerMap[shortTicker] = fullName;
-    });
-
-    return tickerMap;
-  } catch (error) {
-    console.error('Error fetching coin data:', error.message);
-    return {};
-  }
-};
-
-const getCoinPriceByShortTicker = async (shortTicker) => {
-  const tickerMap = await buildTickerMap();
-  const fullTicker = tickerMap[shortTicker.toLowerCase()];
-
-  if (!fullTicker) {
-    console.error(`No mapping found for ${shortTicker}.`);
-    return;
-  }
-
+const getAllCoinPrice = async () => {
   try {
     const response = await axios.get(
-      `https://api.coincap.io/v2/assets/${fullTicker}`
+      "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest",
+      {
+        headers: {
+          "X-CMC_PRO_API_KEY": "6f062bb8-49d9-44c3-8011-761de18dc988", // Replace 'YOUR_API_KEY' with your actual API key
+        },
+        params: {
+          start: 1, // Optional: Start of the page of results (default: 1)
+          limit: 50, // Optional: Number of results per page (default: 100, max: 5000)
+          convert: "USD", // Optional: Convert prices to this currency (default: USD)
+        },
+      }
     );
 
-    if (response.data && response.data.data && response.data.data.priceUsd) {
-      const price = response.data.data.priceUsd;
-      return price;
-    } else {
-      console.error(`Unable to retrieve price data for ${fullTicker}.`);
-    }
+    const data = response.data.data; // Array of cryptocurrency objects
+    return data;
   } catch (error) {
-    console.error('Error fetching data from CoinCap:', error.message);
+    console.error("Error fetching data:", error);
+    throw error;
   }
 };
 
-// Example: Get the current price of Bitcoin (BTC) using short ticker
-module.exports = {getCoinPriceByShortTicker};
+module.exports = { getAllCoinPrice };

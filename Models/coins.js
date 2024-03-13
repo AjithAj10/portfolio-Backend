@@ -5,6 +5,10 @@
             type: String,
             required: true
         },
+        coin: {
+            type: String,
+            required: true
+        },
         avgBuyAmount: {
             type: Number,
             required: true

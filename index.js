@@ -6,6 +6,7 @@ const coinsModel = require('./Models/coins');
 require('dotenv').config();
 app.use(express.json());
 const cors = require('cors');
+const cron = require('node-cron');
 
 app.use(cors());
 
@@ -24,6 +25,16 @@ let fn = async () => {
 };
 
 fn();
+
+
+// cron.schedule('* * * * *', () => {
+//   try {
+//     // Your task code here
+//     console.log('Running a task every day at midnight');
+//   } catch (error) {
+//     console.error('Error executing cron task:', error);
+//   }
+// });
 
 
 app.listen(process.env.PORT || 3100, () => {

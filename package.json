@@ -29,6 +29,7 @@
     "dotenv": "^16.3.1",
     "kucoin-node-sdk": "^1.0.5",
     "mongoose": "^7.6.3",
+    "node-cron": "^3.0.3",
     "node-fetch": "^3.3.2",
     "tesseract.js": "^5.0.2"
   }

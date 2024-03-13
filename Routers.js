@@ -29,10 +29,6 @@ router.use("/binance/trade", async (req, res) => {
   }
 });
 
-router.use("/imageParser", async (req, res) => {
-  let data = await imageParser.extractTextFromImage();
-  res.send(data);
-});
 
 router.post("/addCoin", async (req, res) => {
   let data = await AddCoin.createCoin(req.body);
@@ -53,7 +49,10 @@ router.post("/edit/coin", async (req, res) => {
   if (req.body.status === "active"){
     data = await AddCoin.editCoin(req.body);
   }else  data = await AddCoin.createCoin(req.body);
-
+  
+  if(data?.error){
+    return res.status(500).json({ message: data.error });
+  }
   res.send(data);
 });
 
@@ -81,7 +80,7 @@ router.use("/ku/trades", async (req, res) => {
 });
 router.use("/price", async (req, res) => {
   try {
-    let data = await CoinMarketCap.getCoinPriceByShortTicker(req.body.coin);
+    let data = await CoinMarketCap.getAllCoinPrice();
     res.send(data);
   } catch (err) {
     console.log(err);
